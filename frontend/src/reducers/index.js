@@ -22,10 +22,16 @@ function post(state = {}, action) {
                 [payload.post.id]: payload.post
             };
         case DELETE_POST:
-            return {
-                ...state,
-                [payload.post.id]: null
-            };
+            if (!payload.post.deleted) {
+                return state;
+            }
+            return Object.keys(state)
+                .filter(pId => pId !== payload.post.id)
+                .reduce((obj, pId) => {
+                    const newObj = obj;
+                    newObj[pId] = state[pId];
+                    return newObj;
+                }, {});
         default:
             return state;
     }
@@ -45,10 +51,27 @@ function comment(state = {}, action) {
                 [payload.comment.id]: payload.comment
             };
         case DELETE_COMMENT:
-            return {
-                ...state,
-                [payload.comment.id]: null
-            };
+            if (!payload.comment.deleted) {
+                return state;
+            }
+            return Object.keys(state)
+                .filter(cId => cId !== payload.comment.id)
+                .reduce((obj, cId) => {
+                    const newObj = obj;
+                    newObj[cId] = state[cId];
+                    return newObj;
+                }, {});
+        case DELETE_POST:
+            if (!payload.post.deleted) {
+                return state;
+            }
+            return Object.keys(state)
+                .filter(cId => state[cId].parentId !== payload.post.id)
+                .reduce((obj, cId) => {
+                    const newObj = obj;
+                    newObj[cId] = state[cId];
+                    return newObj;
+                }, {});
         default:
             return state;
     }
