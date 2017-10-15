@@ -1,16 +1,26 @@
+/* eslint-disable no-case-declarations */
 import { combineReducers } from 'redux';
 import {
+    GET_POSTS,
     ADD_POST,
     EDIT_POST,
     DELETE_POST,
     ADD_COMMENT,
     EDIT_COMMENT,
-    DELETE_COMMENT
+    DELETE_COMMENT,
+    GET_COMMENTS_FOR_POST,
+    GET_CATEGORIES
 } from '../actions/index';
 
-function post(state = {}, action) {
+function posts(state = {}, action) {
     const { payload } = action;
     switch (action.type) {
+        case GET_POSTS:
+            return payload.posts.reduce((obj, p) => {
+                const newObj = obj;
+                newObj[p.id] = p;
+                return newObj;
+            }, {});
         case ADD_POST:
             return {
                 ...state,
@@ -37,7 +47,7 @@ function post(state = {}, action) {
     }
 }
 
-function comment(state = {}, action) {
+function comments(state = {}, action) {
     const { payload } = action;
     switch (action.type) {
         case ADD_COMMENT:
@@ -61,6 +71,16 @@ function comment(state = {}, action) {
                     newObj[cId] = state[cId];
                     return newObj;
                 }, {});
+        case GET_COMMENTS_FOR_POST:
+            const newComments = payload.comments.reduce((obj, c) => {
+                const newObj = obj;
+                newObj[c.id] = c;
+                return newObj;
+            }, {});
+            return {
+                ...state,
+                ...newComments
+            };
         case DELETE_POST:
             if (!payload.post.deleted) {
                 return state;
@@ -77,7 +97,18 @@ function comment(state = {}, action) {
     }
 }
 
+function categories(state = [], action) {
+    const { payload } = action;
+    switch (action.type) {
+        case GET_CATEGORIES:
+            return payload.categories;
+        default:
+            return state;
+    }
+}
+
 export default combineReducers({
-    post,
-    comment
+    posts,
+    comments,
+    categories
 });
