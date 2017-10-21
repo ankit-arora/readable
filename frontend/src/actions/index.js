@@ -49,6 +49,21 @@ export function getPosts() {
     };
 }
 
+export function getPost(postId) {
+    return dispatch => {
+        axios.get(`/posts/${postId}`)
+            .then(resp => {
+                dispatch({
+                    type: ADD_POST,
+                    payload: {
+                        post: resp.data
+                    }
+                });
+            })
+            .catch(error => console.log(error));
+    };
+}
+
 export function changePostVote(postId, voteDirection) {
     return dispatch => {
         axios.post(`/posts/${postId}`, { option: voteDirection })
@@ -77,6 +92,15 @@ export function addPost(post) {
                 });
             })
             .catch(error => console.log(error));
+    };
+}
+
+export function addPostNoServerUpdate(post) {
+    return {
+        type: ADD_POST,
+        payload: {
+            post
+        }
     };
 }
 

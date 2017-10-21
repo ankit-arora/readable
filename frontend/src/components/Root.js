@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { getCategories, getPosts } from '../actions';
-import Categories from './Categories';
+import CategoriesLeftNav from './CategoriesLeftNav';
 import Posts from './Posts';
 
 class Root extends Component {
@@ -16,7 +16,9 @@ class Root extends Component {
     }
 
     render() {
-        const { posts, categories } = this.props;
+        const { categories } = this.props;
+        let { posts } = this.props;
+        const { categoryPath } = this.props.match.params;
         if (posts.length === 0 || categories.length === 0) {
             return (
                 <div>
@@ -24,9 +26,13 @@ class Root extends Component {
                 </div>
             );
         }
+        if (typeof categoryPath !== 'undefined') {
+            const selectedCategory = categories.filter(c => c.path === categoryPath)[0].name;
+            posts = posts.filter(p => p.category === selectedCategory);
+        }
         return (
             <div className='row page'>
-                <Categories categories={categories} />
+                <CategoriesLeftNav categories={categories} selectedCategory={categoryPath} />
                 <Posts posts={posts} />
             </div>
         );
@@ -45,17 +51,6 @@ function mapStateToProps({ posts, categories }) {
         arr.push(posts[p]);
         return arr;
     }, []);
-    // const categoriesFromPostsObj = postsArray.reduce((obj, p) => {
-    //     const newObj = obj;
-    //     newObj[p.category] = true;
-    //     return newObj;
-    // }, {});
-    // const categories = Object.keys(categoriesFromPostsObj);
-    // const filteredPostsByCategory = categories.reduce((obj, c) => {
-    //     const newObj = obj;
-    //     newObj[c] = postsArray.filter(p => p.category === c);
-    //     return newObj;
-    // }, {});
     return {
         posts: postsArray,
         categories

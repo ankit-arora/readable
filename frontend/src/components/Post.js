@@ -1,19 +1,13 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { getCommentsForPost, changePostVote } from '../actions';
+import { Link } from 'react-router-dom';
+import { getCommentsForPost, changePostVote, addPostNoServerUpdate } from '../actions';
 
 class Post extends Component {
-    state = {
-        voteScore: 0
-    };
-
     componentDidMount() {
         if (this.props.comments.filter(c => this.props.post.id === c.parentId).length === 0) {
             this.props.getCommentsForPost(this.props.post.id);
         }
-        this.setState({
-           voteScore: this.props.post.voteScore
-        });
     }
 
     render() {
@@ -26,16 +20,18 @@ class Post extends Component {
         const mmm = months[d.getMonth()];
         const yyyy = d.getFullYear();
         const day = d.getDay();
-        const { voteScore } = this.state;
         let commentsLine = 'comments';
         if (commentsForPost.length === 1) {
             commentsLine = 'comment';
         }
+        const linkPath = `/post/show/${post.id}`;
         return (
             <div className="col-xs-2 col-md-3">
                 <div className="thumbnail">
                     <div className="caption">
-                        <h4 style={{ marginBottom: '1px' }}>{post.title}</h4>
+                        <h4 style={{ marginBottom: '1px' }}>
+                            <Link to={linkPath}>{post.title}</Link>
+                        </h4>
                         <p style={{ fontSize: '0.88em', color: 'gray' }}>
                             -by {post.author} on {mmm} {day}, {yyyy} in {post.category}
                         </p>
@@ -47,30 +43,30 @@ class Post extends Component {
                                 {commentsForPost.length} {commentsLine}
                             </p>
                         </div>
-                        <div className='col-md-4'>
-                            <button
-                                className='voteButton'
-                                onClick={() => {
-                                    this.props.changePostVote(post.id, 'downVote');
-                                    this.setState({
-                                        voteScore: post.voteScore - 1
-                                    });
-                                }}
-                            >
-                                <i className="fa fa-chevron-down" aria-hidden="true" />
-                            </button>
+                        <div className='col-md-4' style={{ padding: '0px' }}>
                             <button
                                 className='voteButton'
                                 onClick={() => {
                                     this.props.changePostVote(post.id, 'upVote');
-                                    this.setState({
-                                        voteScore: post.voteScore + 1
-                                    });
+                                    const newPost = post;
+                                    newPost.voteScore += 1;
+                                    this.props.addPostNoServerUpdate(newPost);
                                 }}
                             >
-                                <i className="fa fa-chevron-up" aria-hidden="true" />
+                                <i className="fa fa-thumbs-up" aria-hidden="true" />
                             </button>
-                            <span style={{ marginLeft: '5px' }}>{voteScore}</span>
+                            <button
+                                className='voteButton'
+                                onClick={() => {
+                                    this.props.changePostVote(post.id, 'downVote');
+                                    const newPost = post;
+                                    newPost.voteScore -= 1;
+                                    this.props.addPostNoServerUpdate(newPost);
+                                }}
+                            >
+                                <i className="fa fa-thumbs-down" aria-hidden="true" />
+                            </button>
+                            <span style={{ marginLeft: '5px' }}>{post.voteScore}</span>
                         </div>
                     </div>
                 </div>
@@ -94,7 +90,8 @@ function mapStateToProps({ comments }) {
 function mapDispatchToProps(dispatch) {
     return {
         getCommentsForPost: (postId) => dispatch(getCommentsForPost(postId)),
-        changePostVote: (postId, voteDirection) => dispatch(changePostVote(postId, voteDirection))
+        changePostVote: (postId, voteDirection) => dispatch(changePostVote(postId, voteDirection)),
+        addPostNoServerUpdate: (post) => dispatch(addPostNoServerUpdate(post))
     };
 }
 

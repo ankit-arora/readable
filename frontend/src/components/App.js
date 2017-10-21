@@ -1,9 +1,12 @@
 import React, { Component } from 'react';
-import { connect } from 'react-redux';
+// import { connect } from 'react-redux';
 import { Route, Link } from 'react-router-dom';
+import 'sweetalert2/dist/sweetalert2.css';
 import '../App.css';
-import { addPost, editPost, deletePost, addComment } from '../actions';
+// import { addPost, editPost, deletePost, addComment } from '../actions';
 import Root from './Root';
+import PostDetail from './PostDetail';
+import PostEditCreate from './PostEditCreate';
 
 class App extends Component {
     // componentDidMount() {
@@ -63,13 +66,16 @@ class App extends Component {
                     <div className="container-fluid">
                         <div className="navbar-header">
                             <Link className="navbar-brand" to="/">
-                                React Readable
+                                Readable
                             </Link>
                         </div>
                     </div>
                 </nav>
                 <div className="container">
                     <Route exact path='/' component={Root} />
+                    <Route exact path='/category/:categoryPath' component={Root} />
+                    <Route exact path='/post/show/:postId' component={PostDetail} />
+                    <Route exact path='/post/edit/:postId' component={PostEditCreate} />
                 </div>
             </div>
         );
@@ -82,16 +88,18 @@ class App extends Component {
 // author: String
 // parentId: Should match a post id in the database.
 
-function mapDispatchToProps(dispatch) {
-    return {
-        addPost: (post) => dispatch(addPost(post)),
-        editPost: (newPost) => dispatch(editPost(newPost)),
-        deletePost: (post) => dispatch(deletePost(post)),
-        addComment: (comment) => dispatch(addComment(comment))
-    };
-}
+// function mapDispatchToProps(dispatch) {
+//     return {
+//         addPost: (post) => dispatch(addPost(post)),
+//         editPost: (newPost) => dispatch(editPost(newPost)),
+//         deletePost: (post) => dispatch(deletePost(post)),
+//         addComment: (comment) => dispatch(addComment(comment))
+//     };
+// }
 
-export default connect(
-    null,
-    mapDispatchToProps
-)(App);
+// export default connect(
+//     null,
+//     mapDispatchToProps
+// )(App);
+
+export default App;
