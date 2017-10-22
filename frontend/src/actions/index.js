@@ -168,6 +168,21 @@ export function addComment(comment) {
     };
 }
 
+export function changeCommentVote(commentId, voteDirection) {
+    return dispatch => {
+        axios.post(`/comments/${commentId}`, { option: voteDirection })
+            .then(resp => {
+                dispatch({
+                    type: ADD_COMMENT,
+                    payload: {
+                        comment: resp.data
+                    }
+                });
+            })
+            .catch(error => console.log(error));
+    };
+}
+
 export function editComment({ id, timestamp, body }) {
     return dispatch => {
         axios.put(`/comments/${id}`, { timestamp, body })
@@ -184,9 +199,9 @@ export function editComment({ id, timestamp, body }) {
     };
 }
 
-export function deleteComment({ id }) {
+export function deleteComment(commentId) {
     return dispatch => {
-        axios.delete(`/comments/${id}`)
+        axios.delete(`/comments/${commentId}`)
             .then(resp => {
                 // console.log(resp);
                 dispatch({

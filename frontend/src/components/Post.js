@@ -1,7 +1,12 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
-import { getCommentsForPost, changePostVote, addPostNoServerUpdate } from '../actions';
+import {
+    getCommentsForPost,
+    changePostVote,
+    addPostNoServerUpdate
+} from '../actions';
+import { MONTHS } from '../utils/constants';
 
 class Post extends Component {
     componentDidMount() {
@@ -11,15 +16,13 @@ class Post extends Component {
     }
 
     render() {
-        const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May',
-            'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
         const { post, comments } = this.props;
         const commentsForPost = comments.filter(c => this.props.post.id === c.parentId);
         const { timestamp } = post;
         const d = new Date(timestamp);
-        const mmm = months[d.getMonth()];
+        const mmm = MONTHS[d.getMonth()];
         const yyyy = d.getFullYear();
-        const day = d.getDay();
+        const date = d.getDate();
         let commentsLine = 'comments';
         if (commentsForPost.length === 1) {
             commentsLine = 'comment';
@@ -33,7 +36,7 @@ class Post extends Component {
                             <Link to={linkPath}>{post.title}</Link>
                         </h4>
                         <p style={{ fontSize: '0.88em', color: 'gray' }}>
-                            -by {post.author} on {mmm} {day}, {yyyy} in {post.category}
+                            -by {post.author} on {mmm} {date}, {yyyy} in {post.category}
                         </p>
                         <p>{post.body}</p>
                     </div>

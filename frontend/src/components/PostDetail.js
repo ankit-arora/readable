@@ -2,18 +2,30 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
 import SweetAlert from 'sweetalert2-react';
+import uuid from 'uuid';
+import sortBy from 'sort-by';
 import {
     getPosts,
     deletePost,
     getCommentsForPost,
     changePostVote,
-    addPostNoServerUpdate
+    addPostNoServerUpdate,
+    addComment,
+    deleteComment
 } from '../actions';
+import Comment from './Comment';
+import { MONTHS } from '../utils/constants';
 
 class PostDetail extends Component {
     state = {
-        showDeleteAlert: false
+        showPostDeleteAlert: false,
+        showCommentDeleteAlert: false,
+        commentIdToDelete: '',
+        newCommentBody: '',
+        newCommentUser: '',
+        newCommentError: false
     };
+
     componentDidMount() {
         const { postId } = this.props.match.params;
         if (Object.keys(this.props.posts).length === 0) {
@@ -24,11 +36,42 @@ class PostDetail extends Component {
         }
     }
 
+    handleNewCommentSubmit(event) {
+        event.preventDefault();
+        const { newCommentBody, newCommentUser } = this.state;
+        if (newCommentBody.trim() === '' || newCommentUser.trim() === '') {
+            this.setState({
+                newCommentError: true
+            });
+        } else {
+            const { postId } = this.props.match.params;
+            this.props.addComment({
+                id: uuid().replace(/-/gi, ''),
+                body: newCommentBody,
+                author: newCommentUser,
+                timestamp: (new Date()).getTime(),
+                parentId: postId
+            });
+            this.setState({
+                newCommentBody: '',
+                newCommentUser: '',
+                newCommentError: false
+            });
+        }
+    }
+
+    deleteComment(commentId) {
+        this.setState({
+            commentIdToDelete: commentId,
+            showCommentDeleteAlert: true
+        });
+    }
+
     render() {
         const { postId } = this.props.match.params;
         const { posts, comments } = this.props;
-        const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May',
-            'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+        const { newCommentBody, newCommentUser, newCommentError } = this.state;
+
         if (Object.keys(posts).length === 0) {
             return (
                 <div>
@@ -40,19 +83,21 @@ class PostDetail extends Component {
         const post = posts[postId];
         const { timestamp } = post;
         const d = new Date(timestamp);
-        const mmm = months[d.getMonth()];
+        const mmm = MONTHS[d.getMonth()];
         const yyyy = d.getFullYear();
-        const day = d.getDay();
+        const date = d.getDate();
         const editPath = `/post/edit/${postId}`;
-        const commentsForPost = comments.filter(c => postId === c.parentId);
+        const commentsForPost = comments.filter(c =>
+            postId === c.parentId).sort(sortBy('-voteScore'));
         let commentsLine = 'comments';
         if (commentsForPost.length === 1) {
             commentsLine = 'comment';
         }
+        const newCommentErrorClassDisplay = newCommentError ? 'block' : 'none';
         return (
             <div>
                 <SweetAlert
-                    show={this.state.showDeleteAlert}
+                    show={this.state.showPostDeleteAlert}
                     title="Delete Post?"
                     text="Do you want to delete this post?"
                     showCancelButton
@@ -63,7 +108,27 @@ class PostDetail extends Component {
                     }}
                     onCancel={() => {
                         console.log('cancel');
-                        this.setState({ showDeleteAlert: false });
+                        this.setState({ showPostDeleteAlert: false });
+                    }}
+                />
+                <SweetAlert
+                    show={this.state.showCommentDeleteAlert}
+                    title="Delete Comment?"
+                    text="Do you want to delete this comment?"
+                    showCancelButton
+                    onConfirm={() => {
+                        this.props.deleteComment(this.state.commentIdToDelete);
+                        this.setState({
+                            commentIdToDelete: '',
+                            showCommentDeleteAlert: false
+                        });
+                    }}
+                    onCancel={() => {
+                        console.log('cancel');
+                        this.setState({
+                            commentIdToDelete: '',
+                            showCommentDeleteAlert: false
+                        });
                     }}
                 />
                 <div className='row'>
@@ -75,7 +140,7 @@ class PostDetail extends Component {
                     <div className='col-md-4' style={{ textAlign: 'left' }}>
                         <h4>
                             <p style={{ fontSize: '0.88em', color: 'gray' }}>
-                                -by {post.author} on {mmm} {day}, {yyyy} in {post.category}
+                                -by {post.author} on {mmm} {date}, {yyyy} in {post.category}
                             </p>
                         </h4>
                     </div>
@@ -113,7 +178,7 @@ class PostDetail extends Component {
                                 onClick={() => {
                                     // this.deletePost(post);
                                     this.setState({
-                                        showDeleteAlert: true
+                                        showPostDeleteAlert: true
                                     });
                                 }}
                             >
@@ -138,19 +203,65 @@ class PostDetail extends Component {
                     </div>
                 </div>
 
-                <div className='row' style={{ marginTop: '5px' }}>
-                    <div className='col-md-10'>
-                        <textarea className='form-control' />
-                    </div>
-                </div>
+                <hr style={{ marginTop: '0px' }} />
 
-                <div className='row' style={{ marginTop: '15px' }}>
-                    <div className='col-md-10'>
-                        <button className='btn' style={{ float: 'right' }}>
-                            Add Comment
-                        </button>
+                {commentsForPost.map(comment => (
+                    <Comment
+                        key={comment.id} comment={comment}
+                        deleteComment={commentId => this.deleteComment(commentId)}
+                    />
+                ))}
+
+                <form onSubmit={event => this.handleNewCommentSubmit(event)}>
+                    <div className='row' style={{ marginTop: '5px' }}>
+                        <div className='col-md-12'>
+                            <textarea
+                                onChange={event => this.setState({
+                                    newCommentBody: event.target.value
+                                })}
+                                placeholder='comment body' className='form-control'
+                                value={newCommentBody}
+                            />
+                        </div>
                     </div>
-                </div>
+
+                    <div className='row' style={{ marginTop: '5px' }}>
+                        <div className='col-md-12'>
+                            <input
+                                onChange={event => this.setState({
+                                    newCommentUser: event.target.value
+                                })}
+                                placeholder='your name'
+                                type='text'
+                                style={{ float: 'right', width: '30%' }}
+                                className='form-control'
+                                value={newCommentUser}
+                            />
+                        </div>
+                    </div>
+
+                    <div
+                        className='row'
+                        style={{ marginTop: '5px', display: newCommentErrorClassDisplay }}
+                    >
+                        <div className='col-md-12'>
+                            <div style={{ color: 'red', float: 'right', width: '28%' }}>
+                                Invalid or missing comment body or username.
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className='row' style={{ marginTop: '15px' }}>
+                        <div className='col-md-12'>
+                            <input
+                                type='submit'
+                                value='Add New Comment'
+                                className='btn'
+                                style={{ float: 'right', outline: 'none' }}
+                            />
+                        </div>
+                    </div>
+                </form>
             </div>
         );
     }
@@ -171,11 +282,13 @@ function mapStateToProps({ posts, comments }) {
 
 function mapDispatchToProps(dispatch) {
     return {
-        getCommentsForPost: (postId) => dispatch(getCommentsForPost(postId)),
+        getCommentsForPost: postId => dispatch(getCommentsForPost(postId)),
         getPosts: () => dispatch(getPosts()),
-        deletePost: (post) => dispatch(deletePost(post)),
+        deletePost: post => dispatch(deletePost(post)),
         changePostVote: (postId, voteDirection) => dispatch(changePostVote(postId, voteDirection)),
-        addPostNoServerUpdate: (post) => dispatch(addPostNoServerUpdate(post))
+        addPostNoServerUpdate: post => dispatch(addPostNoServerUpdate(post)),
+        addComment: comment => dispatch(addComment(comment)),
+        deleteComment: commentId => dispatch(deleteComment(commentId))
     };
 }
 
