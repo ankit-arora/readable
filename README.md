@@ -1,4 +1,4 @@
-## Running the backend server
+## Start the backend server
 
 ### `cd api-server`
 Gets you into the api-server directory
@@ -9,7 +9,7 @@ Installs backend server dependencies from package.json
 ### `node server.js`
 Starts the backend server
 
-## Running the frontend server
+## Start the frontend server
 
 ### `cd frontend`
 Gets you into the frontend directory
