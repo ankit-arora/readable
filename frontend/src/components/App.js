@@ -19,6 +19,15 @@ class App extends Component {
                                 Readable
                             </Link>
                         </div>
+                        <nav className='collapse navbar-collapse' >
+                            <ul className='nav navbar-nav navbar-right'>
+                                <li>
+                                    <Link to="/post/create">
+                                        CREATE POST
+                                    </Link>
+                                </li>
+                            </ul>
+                        </nav>
                     </div>
                 </nav>
                 <div className="container">

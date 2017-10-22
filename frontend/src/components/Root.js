@@ -5,6 +5,9 @@ import CategoriesLeftNav from './CategoriesLeftNav';
 import Posts from './Posts';
 
 class Root extends Component {
+    state = {
+        isFetching: true
+    };
     componentDidMount() {
         if (this.props.categories.length === 0) {
             this.props.getCategories();
@@ -19,7 +22,7 @@ class Root extends Component {
         const { categories } = this.props;
         let { posts } = this.props;
         const { categoryPath } = this.props.match.params;
-        if (posts.length === 0 || categories.length === 0) {
+        if (categories.length === 0) {
             return (
                 <div>
                     Loading
