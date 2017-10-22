@@ -22,7 +22,7 @@ class App extends Component {
                         <nav className='collapse navbar-collapse' >
                             <ul className='nav navbar-nav navbar-right'>
                                 <li>
-                                    <Link to="/post/create">
+                                    <Link to="/post/create/new">
                                         CREATE POST
                                     </Link>
                                 </li>
@@ -32,10 +32,10 @@ class App extends Component {
                 </nav>
                 <div className="container">
                     <Route exact path='/' component={Root} />
-                    <Route exact path='/category/:categoryPath' component={Root} />
-                    <Route exact path='/post/show/:postId' component={PostDetail} />
                     <Route exact path='/post/edit/:postId' component={PostEditCreate} />
-                    <Route exact path='/post/create' component={PostEditCreate} />
+                    <Route exact path='/post/create/new' component={PostEditCreate} />
+                    <Route exact path='/:categoryPath' component={Root} />
+                    <Route exact path='/:categoryPath/:postId' component={PostDetail} />
                 </div>
             </div>
         );

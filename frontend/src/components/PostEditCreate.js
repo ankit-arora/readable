@@ -82,7 +82,7 @@ class PostEditCreate extends Component {
                 author: postUser
             });
             const { history } = this.props;
-            history.push(`/post/show/${id}`);
+            history.push('/');
         }
     }
 
@@ -100,7 +100,7 @@ class PostEditCreate extends Component {
                 body: postBody
             });
             const { history } = this.props;
-            history.push(`/post/show/${postId}`);
+            history.push('/');
         }
     }
 

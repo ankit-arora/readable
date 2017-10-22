@@ -27,7 +27,8 @@ class Post extends Component {
         if (commentsForPost.length === 1) {
             commentsLine = 'comment';
         }
-        const linkPath = `/post/show/${post.id}`;
+        const linkPath = `/${post.category}/${post.id}`;
+        const editPath = `/post/edit/${post.id}`;
         return (
             <div className="col-xs-2 col-md-3">
                 <div className="thumbnail">
@@ -70,6 +71,22 @@ class Post extends Component {
                                 <i className="fa fa-thumbs-down" aria-hidden="true" />
                             </button>
                             <span style={{ marginLeft: '5px' }}>{post.voteScore}</span>
+                        </div>
+                    </div>
+                    <div className='row'>
+                        <div className='col-md-6'>
+                            <Link to={editPath} style={{ marginLeft: '15px' }}>
+                                <i className="fa fa-pencil-square-o" aria-hidden="true" />
+                            </Link>
+                            <button
+                                className='deletePostButton'
+                                style={{ marginLeft: '10px' }}
+                                onClick={() => {
+                                    this.props.handleDeletePost(post.id);
+                                }}
+                            >
+                                <i className="fa fa-trash-o" aria-hidden="true" />
+                            </button>
                         </div>
                     </div>
                 </div>

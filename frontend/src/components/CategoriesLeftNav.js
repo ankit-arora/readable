@@ -9,7 +9,7 @@ class CategoriesLeftNav extends Component {
                 <div className='titleText'>Categories</div>
                 {
                     categories.map((c, i) => {
-                        const linkPath = `/category/${c.path}`;
+                        const linkPath = `/${c.path}`;
                         if (typeof selectedCategory !== 'undefined' &&
                             selectedCategory === c.path) {
                             return (
