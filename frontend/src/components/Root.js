@@ -19,10 +19,10 @@ class Root extends Component {
     }
 
     render() {
-        const { categories } = this.props;
+        const { categories, postsFetching } = this.props;
         let { posts } = this.props;
         const { categoryPath } = this.props.match.params;
-        if (categories.length === 0) {
+        if (categories.length === 0 || postsFetching) {
             return (
                 <div>
                     Loading
@@ -50,13 +50,15 @@ function mapDispatchToProps(dispatch) {
 }
 
 function mapStateToProps({ posts, categories }) {
-    const postsArray = Object.keys(posts).reduce((arr, p) => {
-        arr.push(posts[p]);
+    const { items, isFetching } = posts;
+    const postsArray = Object.keys(items).reduce((arr, p) => {
+        arr.push(items[p]);
         return arr;
     }, []);
     return {
         posts: postsArray,
-        categories
+        categories,
+        postsFetching: isFetching
     };
 }
 

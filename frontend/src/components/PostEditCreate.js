@@ -21,9 +21,10 @@ class PostEditCreate extends Component {
     componentDidMount() {
         const { postId } = this.props.match.params;
         if (typeof postId !== 'undefined') {
+            const { postsFetching, posts } = this.props;
             let fetchPosts = true;
-            if (this.props.posts.length > 0) {
-                const post = this.props.posts[postId];
+            if (!postsFetching && posts.length > 0) {
+                const post = posts[postId];
                 if (typeof post !== 'undefined') {
                     fetchPosts = false;
                 }
@@ -37,9 +38,9 @@ class PostEditCreate extends Component {
     }
 
     componentWillReceiveProps(nextProps) {
-        const { posts } = nextProps;
+        const { posts, postsFetching } = nextProps;
         const { postId } = this.props.match.params;
-        if (Object.keys(posts).length > 0 && typeof postId !== 'undefined') {
+        if (!postsFetching && typeof postId !== 'undefined') {
             const post = posts[postId];
             if (typeof post !== 'undefined') {
                 this.setState({
@@ -118,7 +119,7 @@ class PostEditCreate extends Component {
                     </div>
                 </div>
                 <form onSubmit={event => this.handlePostSubmit(event)}>
-                    <div className='row' style={{ marginTop: '15px' }}>
+                    <div className='row MT-15'>
                         <div className='col-md-12'>
                             <input
                                 placeholder='post title'
@@ -128,7 +129,7 @@ class PostEditCreate extends Component {
                             />
                         </div>
                     </div>
-                    <div className='row' style={{ marginTop: '15px' }}>
+                    <div className='row MT-15'>
                         <div className='col-md-12'>
                             <textarea
                                 placeholder='post body'
@@ -140,7 +141,7 @@ class PostEditCreate extends Component {
                     </div>
 
                     {isCreate ?
-                        <div className='row' style={{ marginTop: '15px' }}>
+                        <div className='row MT-15'>
                             <div className='col-md-12'>
                                 <select
                                     value={this.state.postCategory}
@@ -158,7 +159,7 @@ class PostEditCreate extends Component {
                     }
 
                     {isCreate ?
-                        <div className='row' style={{ marginTop: '15px' }}>
+                        <div className='row MT-15'>
                             <div className='col-md-12'>
                                 <input
                                     className='form-control'
@@ -177,13 +178,13 @@ class PostEditCreate extends Component {
                         style={{ marginTop: '5px', display: newPostErrorClassDisplay }}
                     >
                         <div className='col-md-12'>
-                            <div style={{ color: 'red', float: 'right', width: '28%' }}>
+                            <div className='errorMessage'>
                                 Invalid or missing post info.
                             </div>
                         </div>
                     </div>
 
-                    <div className='row' style={{ marginTop: '15px', float: 'right' }}>
+                    <div className='row MT-15 F-right'>
                         <div className='col-md-12'>
                             <input className='btn' type='submit' value='Save Post' />
                         </div>
@@ -195,8 +196,10 @@ class PostEditCreate extends Component {
 }
 
 function mapStateToProps({ posts, categories }) {
+    const { items, isFetching } = posts;
     return {
-        posts,
+        posts: items,
+        postsFetching: isFetching,
         categories
     };
 }

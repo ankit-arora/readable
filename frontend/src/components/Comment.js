@@ -54,18 +54,16 @@ class Comment extends Component {
                                 />
                         </div>
                     </div>
-                    <div className='row' style={{ marginTop: '10px' }}>
+                    <div className='row MT-10' >
                         <div className='col-md-12'>
-                            <div style={{ float: 'right' }}>
+                            <div className='F-right'>
                                 <input
-                                    style={{ margin: '5px' }}
-                                    className='btn' type='button'
+                                    className='btn M-5' type='button'
                                     value='Cancel'
                                     onClick={() => this.cancelCommentEdit()}
                                 />
                                 <input
-                                    style={{ margin: '5px' }}
-                                    className='btn'
+                                    className='btn M-5'
                                     type='submit'
                                     value='Save'
                                 />
@@ -85,7 +83,7 @@ class Comment extends Component {
                 </div>
                 <div className='row'>
                     <div className='col-md-2'>
-                        <p style={{ fontSize: '0.88em', color: 'gray' }}>
+                        <p className='commentAuthorLine'>
                             -by {comment.author} on {mmm} {date}, {yyyy}
                         </p>
                     </div>
@@ -106,9 +104,9 @@ class Comment extends Component {
                         >
                             <i className="fa fa-thumbs-down" aria-hidden="true" />
                         </button>
-                        <span style={{ marginLeft: '5px' }}>{comment.voteScore}</span>
+                        <span className='ML-5'>{comment.voteScore}</span>
                         <button
-                            className='deletePostButton' style={{ marginLeft: '10px' }}
+                            className='deletePostButton ML-10'
                             onClick={() => this.setState({
                                 edit: true,
                                 editCommentBody: comment.body
@@ -117,8 +115,7 @@ class Comment extends Component {
                             <i className="fa fa-pencil-square-o" aria-hidden="true" />
                         </button>
                         <button
-                            className='deletePostButton'
-                            style={{ marginLeft: '10px' }}
+                            className='deletePostButton ML-10'
                             onClick={() => {
                                 this.props.deleteComment(comment.id);
                             }}

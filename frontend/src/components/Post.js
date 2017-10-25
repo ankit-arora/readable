@@ -1,11 +1,7 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
-import {
-    getCommentsForPost,
-    changePostVote,
-    addPostNoServerUpdate
-} from '../actions';
+import * as actions from '../actions';
 import { MONTHS } from '../utils/constants';
 
 class Post extends Component {
@@ -33,21 +29,21 @@ class Post extends Component {
             <div className="col-xs-2 col-md-3">
                 <div className="thumbnail">
                     <div className="caption">
-                        <h4 style={{ marginBottom: '1px' }}>
+                        <h4 className='MB-1'>
                             <Link to={linkPath}>{post.title}</Link>
                         </h4>
-                        <p style={{ fontSize: '0.88em', color: 'gray' }}>
+                        <p className='commentAuthorLine'>
                             -by {post.author} on {mmm} {date}, {yyyy} in {post.category}
                         </p>
                         <p>{post.body}</p>
                     </div>
                     <div className='row'>
                         <div className='col-md-8'>
-                            <p style={{ fontSize: '0.88em', color: 'gray', marginLeft: '9px' }}>
+                            <p className='commentAuthorLine ML-9'>
                                 {commentsForPost.length} {commentsLine}
                             </p>
                         </div>
-                        <div className='col-md-4' style={{ padding: '0px' }}>
+                        <div className='col-md-4 P-0'>
                             <button
                                 className='voteButton'
                                 onClick={() => {
@@ -70,17 +66,16 @@ class Post extends Component {
                             >
                                 <i className="fa fa-thumbs-down" aria-hidden="true" />
                             </button>
-                            <span style={{ marginLeft: '5px' }}>{post.voteScore}</span>
+                            <span className='ML-5' >{post.voteScore}</span>
                         </div>
                     </div>
                     <div className='row'>
                         <div className='col-md-6'>
-                            <Link to={editPath} style={{ marginLeft: '15px' }}>
+                            <Link to={editPath} className='ML-15' >
                                 <i className="fa fa-pencil-square-o" aria-hidden="true" />
                             </Link>
                             <button
-                                className='deletePostButton'
-                                style={{ marginLeft: '10px' }}
+                                className='deletePostButton ML-10'
                                 onClick={() => {
                                     this.props.handleDeletePost(post.id);
                                 }}
@@ -107,12 +102,4 @@ function mapStateToProps({ comments }) {
     };
 }
 
-function mapDispatchToProps(dispatch) {
-    return {
-        getCommentsForPost: (postId) => dispatch(getCommentsForPost(postId)),
-        changePostVote: (postId, voteDirection) => dispatch(changePostVote(postId, voteDirection)),
-        addPostNoServerUpdate: (post) => dispatch(addPostNoServerUpdate(post))
-    };
-}
-
-export default connect(mapStateToProps, mapDispatchToProps)(Post);
+export default connect(mapStateToProps, actions)(Post);

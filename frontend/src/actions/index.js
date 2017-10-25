@@ -1,16 +1,17 @@
 import axios from 'axios';
 
-export const GET_POSTS = 'GET_POSTS';
-export const ADD_POST = 'ADD_POST';
-export const EDIT_POST = 'EDIT_POST';
-export const DELETE_POST = 'DELETE_POST';
-export const SORT_POST = 'SORT_POSTS';
-export const SORT_COMMENTS = 'SORT_COMMENTS';
-export const ADD_COMMENT = 'ADD_COMMENT';
-export const GET_COMMENTS_FOR_POST = 'GET_COMMENTS_FOR_POST';
-export const EDIT_COMMENT = 'EDIT_COMMENT';
-export const DELETE_COMMENT = 'DELETE_COMMENT';
-export const GET_CATEGORIES = 'GET_CATEGORIES';
+import {
+    GET_POSTS,
+    ADD_POST,
+    EDIT_POST,
+    DELETE_POST,
+    FETCH_POSTS,
+    ADD_COMMENT,
+    GET_COMMENTS_FOR_POST,
+    EDIT_COMMENT,
+    DELETE_COMMENT,
+    GET_CATEGORIES
+} from './type';
 
 const AUTH_TOKEN = 'testAuthToken';
 const API_URL = 'http://localhost:3001';
@@ -46,6 +47,7 @@ export function getPosts() {
                 });
             })
             .catch(error => console.log(error));
+        dispatch({ type: FETCH_POSTS });
     };
 }
 

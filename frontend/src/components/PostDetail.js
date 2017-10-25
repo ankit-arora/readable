@@ -4,15 +4,7 @@ import { Link } from 'react-router-dom';
 import SweetAlert from 'sweetalert2-react';
 import uuid from 'uuid';
 import sortBy from 'sort-by';
-import {
-    getPosts,
-    deletePost,
-    getCommentsForPost,
-    changePostVote,
-    addPostNoServerUpdate,
-    addComment,
-    deleteComment
-} from '../actions';
+import * as actions from '../actions';
 import Comment from './Comment';
 import { MONTHS } from '../utils/constants';
 
@@ -69,10 +61,10 @@ class PostDetail extends Component {
 
     render() {
         const { postId } = this.props.match.params;
-        const { posts, comments } = this.props;
+        const { posts, comments, postsFetching } = this.props;
         const { newCommentBody, newCommentUser, newCommentError } = this.state;
 
-        if (Object.keys(posts).length === 0) {
+        if (postsFetching) {
             return (
                 <div>
                     Loading
@@ -81,6 +73,13 @@ class PostDetail extends Component {
         }
 
         const post = posts[postId];
+        if (typeof post === 'undefined') {
+            return (
+                <div>
+                    404 page
+                </div>
+            );
+        }
         const { timestamp } = post;
         const d = new Date(timestamp);
         const mmm = MONTHS[d.getMonth()];
@@ -107,7 +106,6 @@ class PostDetail extends Component {
                         history.push('/');
                     }}
                     onCancel={() => {
-                        console.log('cancel');
                         this.setState({ showPostDeleteAlert: false });
                     }}
                 />
@@ -124,7 +122,6 @@ class PostDetail extends Component {
                         });
                     }}
                     onCancel={() => {
-                        console.log('cancel');
                         this.setState({
                             commentIdToDelete: '',
                             showCommentDeleteAlert: false
@@ -137,9 +134,9 @@ class PostDetail extends Component {
                     </div>
                 </div>
                 <div className='row'>
-                    <div className='col-md-4' style={{ textAlign: 'left' }}>
+                    <div className='col-md-4 TA-L' >
                         <h4>
-                            <p style={{ fontSize: '0.88em', color: 'gray' }}>
+                            <p className='commentAuthorLine'>
                                 -by {post.author} on {mmm} {date}, {yyyy} in {post.category}
                             </p>
                         </h4>
@@ -168,13 +165,12 @@ class PostDetail extends Component {
                             >
                                 <i className="fa fa-thumbs-down" aria-hidden="true" />
                             </button>
-                            <span style={{ marginLeft: '5px' }}>{post.voteScore}</span>
-                            <Link to={editPath} style={{ marginLeft: '15px' }}>
+                            <span className='ML-5' >{post.voteScore}</span>
+                            <Link to={editPath} className='ML-15'>
                                 <i className="fa fa-pencil-square-o" aria-hidden="true" />
                             </Link>
                             <button
-                                className='deletePostButton'
-                                style={{ marginLeft: '10px' }}
+                                className='deletePostButton ML-10'
                                 onClick={() => {
                                     // this.deletePost(post);
                                     this.setState({
@@ -194,16 +190,15 @@ class PostDetail extends Component {
                     </div>
                 </div>
 
-                <div className='row' style={{ marginTop: '5px' }}>
+                <div className='row MT-5' >
                     <div
-                        className='col-md-2'
-                        style={{ fontSize: '1.0em', color: 'gray' }}
+                        className='col-md-2 inlineCommentAuthorLine'
                     >
                         {commentsForPost.length} {commentsLine}
                     </div>
                 </div>
 
-                <hr style={{ marginTop: '0px' }} />
+                <hr className='MT-0' />
 
                 {commentsForPost.map(comment => (
                     <Comment
@@ -213,7 +208,7 @@ class PostDetail extends Component {
                 ))}
 
                 <form onSubmit={event => this.handleNewCommentSubmit(event)}>
-                    <div className='row' style={{ marginTop: '5px' }}>
+                    <div className='row MT-5'>
                         <div className='col-md-12'>
                             <textarea
                                 onChange={event => this.setState({
@@ -225,7 +220,7 @@ class PostDetail extends Component {
                         </div>
                     </div>
 
-                    <div className='row' style={{ marginTop: '5px' }}>
+                    <div className='row MT-5'>
                         <div className='col-md-12'>
                             <input
                                 onChange={event => this.setState({
@@ -233,8 +228,7 @@ class PostDetail extends Component {
                                 })}
                                 placeholder='your name'
                                 type='text'
-                                style={{ float: 'right', width: '30%' }}
-                                className='form-control'
+                                className='form-control commentUserInput'
                                 value={newCommentUser}
                             />
                         </div>
@@ -245,19 +239,18 @@ class PostDetail extends Component {
                         style={{ marginTop: '5px', display: newCommentErrorClassDisplay }}
                     >
                         <div className='col-md-12'>
-                            <div style={{ color: 'red', float: 'right', width: '28%' }}>
+                            <div className='errorMessage'>
                                 Invalid or missing comment body or username.
                             </div>
                         </div>
                     </div>
 
-                    <div className='row' style={{ marginTop: '15px' }}>
+                    <div className='row MT-15'>
                         <div className='col-md-12'>
                             <input
                                 type='submit'
                                 value='Add New Comment'
-                                className='btn'
-                                style={{ float: 'right', outline: 'none' }}
+                                className='newCommentButton btn'
                             />
                         </div>
                     </div>
@@ -268,6 +261,7 @@ class PostDetail extends Component {
 }
 
 function mapStateToProps({ posts, comments }) {
+    const { items, isFetching } = posts;
     const commentsArr = Object.keys(comments).reduce((arr, cId) => {
         const newArr = arr;
         newArr.push(comments[cId]);
@@ -275,21 +269,10 @@ function mapStateToProps({ posts, comments }) {
     }, []);
 
     return {
-        posts,
+        posts: items,
+        postsFetching: isFetching,
         comments: commentsArr
     };
 }
 
-function mapDispatchToProps(dispatch) {
-    return {
-        getCommentsForPost: postId => dispatch(getCommentsForPost(postId)),
-        getPosts: () => dispatch(getPosts()),
-        deletePost: post => dispatch(deletePost(post)),
-        changePostVote: (postId, voteDirection) => dispatch(changePostVote(postId, voteDirection)),
-        addPostNoServerUpdate: post => dispatch(addPostNoServerUpdate(post)),
-        addComment: comment => dispatch(addComment(comment)),
-        deleteComment: commentId => dispatch(deleteComment(commentId))
-    };
-}
-
-export default connect(mapStateToProps, mapDispatchToProps)(PostDetail);
+export default connect(mapStateToProps, actions)(PostDetail);

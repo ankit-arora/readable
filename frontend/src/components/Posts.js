@@ -59,14 +59,7 @@ class Posts extends Component {
                 <div className='col-md-10'>
                     <div className='row'>
                         <div
-                            style={{
-                                textAlign: 'right',
-                                verticalAlign: 'middle',
-                                paddingTop: '10px',
-                                paddingRight: '6px',
-                                fontSize: '1.1em'
-                            }}
-                            className='titleText col-md-4'
+                            className='sortText col-md-4'
                         >
                             Sort posts by
                         </div>
@@ -82,9 +75,7 @@ class Posts extends Component {
                         </select>
                     </div>
                     <div
-                        className='row' style={{
-                        marginTop: '20px'
-                    }}
+                        className='row MT-20'
                     >
                         {posts.map((p, i) =>
                             (<Post
